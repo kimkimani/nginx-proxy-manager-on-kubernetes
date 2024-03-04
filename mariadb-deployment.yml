@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+# mariadb deployment
+  name: mariadb  
+spec:
+# Number of mariadb replicas (instances)
+  replicas: 1  
+  selector:
+    matchLabels:
+      app: mariadb 
+  template:
+    metadata:
+      labels:
+        app: mariadb 
+    spec:
+      containers:
+      # Name mariadb container
+      - name: mariadb  
+      # Docker image for MariaDB
+        image: jc21/mariadb-aria:latest  
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root_pass"  # MariaDB root password
+        - name: MYSQL_DATABASE
+          value: "proxy-manager"  # MariaDB database name
+        - name: MYSQL_USER
+          value: "proxy_manager_user"  # MariaDB username
+        - name: MYSQL_PASSWORD
+          value: "user_pass"  # MariaDB user password
+        volumeMounts:
+        - name: data
+        # Mount MariaDB path for persistent data
+          mountPath: /var/lib/mysql  
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+        # Use PersistentVolumeClaim for MariaDB data
+          claimName: mariadb-data-pvc  
